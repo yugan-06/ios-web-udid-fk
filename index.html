@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>获取卡密</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f8ff;
+            text-align: center;
+            color: #333;
+        }
+        .container {
+            margin-top: 50px;
+        }
+        h1 {
+            color: #007bff;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+        button:disabled {
+            background-color: #cccccc;
+        }
+        .info {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #666;
+        }
+        .avatar-container img {
+            border-radius: 50%;
+            width: 150px;
+            height: 150px;
+        }
+        .hidden {
+            display: none;
+        }
+        /* 新增底部头像样式 */
+        .footer-avatars {
+            display: flex;
+            justify-content: center;
+            margin-top: 50px;
+        }
+        .footer-avatar {
+            margin: 0 20px;
+            text-align: center;
+        }
+        .footer-avatar img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        .footer-avatar p {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #007bff;
+        }
+    </style>
+</head>
+<body>
+    
+    <h1>获取卡密</h1>
+    <p>本获取系统由GDweb 鱼干 酷卡科技共同出品 免费交流学习无任何收费 如果你是购买请你立马举报退款</p >
+    <marquee>
+        <b id="nr">1.提示：每个udid最多只能获取2次卡密，如果超出获取次数，系统会自动拉黑设备，不给予解封！2.常见问题：如果你出现无法获取描述文件或获取失败，则表明你的设备已被拉黑，免费获取，如果你是花钱买的请立即举报并退款</b>
+    </marquee>
+
+    <!-- 头像展示，删除旋转功能 -->
+    <div class="avatar-container">
+        <img src="img/库卡.jpg" alt="头像">
+    </div>
+
+    <!-- 显示UDID及相关状态 -->
+    <p id="udid-info" class="info">正在检测设备信息...</p >
+
+    <!-- 获取UDID按钮 -->
+    <button id="get-udid-btn">获取UDID</button>
+
+    <!-- 获取卡密按钮 -->
+    <button id="get-key-btn" class="hidden" disabled>获取卡密</button>
+
+    <!-- 提示信息 -->
+    <p id="message" class="info"></p >
+<h3>--开发人员--</h3>
+    <!-- 底部头像及组织名 -->
+    <div class="footer-avatars">
+        <div class="footer-avatar">
+            <img src="img/gdweb.jpg" alt="GDweb" onclick="window.location.href='https://iosgd.cn'">
+            <p>GDweb</p >
+        </div>
+        <div class="footer-avatar">
+            <img src="img/yugan.jpg" alt="鱼干" onclick="window.location.href='https://t.me/color0805'">
+            <p>鱼干</p >
+        </div>
+        <div class="footer-avatar">
+            <img src="img/库卡.jpg" alt="酷卡科技" onclick="window.location.href='https://ios.ioskuka.com/'">
+            <p>酷卡科技</p >
+        </div>
+    </div>
+<script>
+    // 获取 User-Agent
+    var userAgent = navigator.userAgent;
+
+    // 检查是否是 iOS 的 Safari 或 Android 的 Chrome
+    if (!(userAgent.includes("Safari") && userAgent.includes("Mobile")) && // iOS Safari
+        !(userAgent.includes("Chrome") && userAgent.includes("Android"))) { // Android Chrome
+        // 如果不是自带浏览器，显示警告并重定向
+        document.body.innerHTML = "<h2>访问受限：请使用设备自带浏览器访问此页面。</h2>";
+        setTimeout(function() {
+            window.location.href = "about:blank"; // 你也可以重定向到其它页面
+        }, 3000);
+    }
+</script>
+
+<script>
+
+    // 获取URL参数的函数
+    function getQueryParam(param) {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get(param);
+    }
+
+    // 显示设备的UDID信息
+    function showUDIDInfo() {
+        const udid = getQueryParam('UDID');
+        if (udid) {
+            document.getElementById('udid-info').innerText = '您的设备UDID为：' + udid;
+            document.getElementById('get-key-btn').disabled = false;
+            document.getElementById('get-key-btn').classList.remove('hidden');
+            document.getElementById('get-udid-btn').classList.add('hidden');
+        } else {
+            document.getElementById('udid-info').innerText = '请先获取您的设备UDID。';
+        }
+    }
+
+    // 获取UDID按钮点击事件
+    document.getElementById('get-udid-btn').addEventListener('click', function() {
+        // Redirect to the profile download page
+        window.location.href = 'https://kuka.qfios.vip/get_udid.php';
+    });
+
+    // 获取卡密按钮点击事件
+    document.getElementById('get-key-btn').addEventListener('click', function() {
+        fetch('get_key.php?UDID=' + getQueryParam('UDID'))
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('message').innerText = '您的卡密是：' + (data.key || data.message);
+                } else {
+                    document.getElementById('message').innerText = data.message;
+                }
+            })
+            .catch(error => {
+                document.getElementById('message').innerText = '发生错误，请稍后再试。';
+            });
+    });
+
+    // 页面加载完成后检查UDID状态
+    window.onload = showUDIDInfo;
+    // 禁止右键点击
+    document.addEventListener('contextmenu', function(e) {
+        e.preventDefault();
+        alert('右键已被禁用！');
+    });
+
+    // 禁止 F12 开发者工具
+    document.onkeydown = function(e) {
+        // 禁用 F12 键、Ctrl + Shift + I、Ctrl + Shift + C、Ctrl + Shift + J、Ctrl + U
+        if (e.key === 'F12' || 
+            (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'C' || e.key === 'J')) ||
+            (e.ctrlKey && e.key === 'U')) {
+            e.preventDefault();
+            alert('F12已被禁用！');
+            return false;
+        }
+    };
+
+    // 检测是否打开了开发者工具 (适用于Windows和Safari)
+    
+    // 抓包检测 (检测XMLHttpRequest拦截)
+    (function() {
+        const oldXHR = window.XMLHttpRequest;
+        function newXHR() {
+            const xhr = new oldXHR();
+            const open = xhr.open;
+            xhr.open = function() {
+                console.log('检测到抓包行为！');
+                alert('检测到抓包工具，禁止使用！');
+                return open.apply(this, arguments);
+            };
+            return xhr;
+        }
+        window.XMLHttpRequest = newXHR;
+    })();
+</script>
+
+</body>
+</html>
